@@ -12,7 +12,7 @@ type Pages struct {
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
-	var step uint64 = 10
+	var step uint64 = 12
 	data := struct {
 		Category   string
 		Categories []string
