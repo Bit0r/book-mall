@@ -13,7 +13,7 @@ type Book struct {
 	Intro        string
 }
 
-type Books []Book
+type Books = []Book
 
 func GetCategories() (names []string) {
 	query := `select distinct name
@@ -44,7 +44,7 @@ func GetBooks(category string, offset, row_count uint64) (rows Books) {
 	case category == "" && info == "":
 		query = `select id, isbn, name, author, price, intro
 		from book
-		where inventory > 0
+		where not deleted
 		limit ?, ?`
 		rs, _ = db.Query(query, offset, row_count)
 	case category != "" && info == "":
@@ -52,13 +52,13 @@ func GetBooks(category string, offset, row_count uint64) (rows Books) {
 		from book, category
 		where id = category.book_id
 			and category.name = ?
-			and inventory > 0
+			and not deleted
 		limit ?, ?`
 		rs, _ = db.Query(query, category, offset, row_count)
 	case category == "" && info != "":
 		query = `select id, isbn, name, author, price, intro
 		from book
-		where inventory > 0 and (isbn = ? or name regex ? or author regex ?)
+		where not deleted and (isbn = ? or name regex ? or author regex ?)
 		limit ?, ?`
 		rs, _ = db.Query(query, offset, row_count)
 	}
@@ -84,14 +84,14 @@ func CountBooks(category string) (count uint64) {
 	if category == "" {
 		query = `select count(*)
 		from book
-		where inventory > 0`
+		where not deleted`
 		db.QueryRow(query).Scan(&count)
 	} else {
 		query = `select count(*)
 		from book, category
 		where id = category.book_id
 			and category.name = ?
-			and inventory > 0`
+			and not deleted`
 		db.QueryRow(query, category).Scan(&count)
 	}
 	return
