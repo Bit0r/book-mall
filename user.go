@@ -2,6 +2,7 @@ package main
 
 import (
 	"book-mall/model"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,5 +41,43 @@ func handleRegistry(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 	} else {
 		sessions.Start(w, r).Set("userID", id)
+	}
+}
+
+func handleOrder(w http.ResponseWriter, r *http.Request) {
+	if _, ok := sessions.Start(w, r).Get("userID").(uint64); ok {
+
+	} else {
+		http.Redirect(w, r, "/log-in", http.StatusFound)
+	}
+}
+
+func handleShoppingCart(w http.ResponseWriter, r *http.Request) {
+	id, ok := sessions.Start(w, r).Get("userID").(uint64)
+	if !ok {
+		http.Redirect(w, r, "/log-in", http.StatusFound)
+		return
+	}
+	files := []string{"layout.html", "navbar.html", "shopping-cart.html"}
+	for idx, file := range files {
+		files[idx] = templateRoot + file
+	}
+	t, _ := template.ParseFiles(files...)
+	t.ExecuteTemplate(w, "layout.html", model.GetCartItems(id))
+}
+
+func handleUpdateCartItem(w http.ResponseWriter, r *http.Request) {
+	userID, ok := sessions.Start(w, r).Get("userID").(uint64)
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	} else {
+		values := r.URL.Query()
+		bookID, _ := strconv.ParseUint(values.Get("id"), 0, 64)
+		quantity, _ := strconv.Atoi(values.Get("quantity"))
+		err := model.UpdateCartItem(userID, bookID, uint(quantity))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/kataras/go-sessions/v3"
 )
 
 type Pages struct {
@@ -38,7 +40,13 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 	// 填充图书信息
 	data.Books = model.GetBooks(data.Category, uint64((data.Cur-1)*step), uint64(step))
 
-	t, _ := template.ParseFiles("template/layout.html", "template/navbar.html", "template/home.html")
+	files := []string{"layout.html", "home.html", "navbar-guest.html"}
+
+	if sessions.Start(w, r).Get("userID") != nil {
+		files[2] = "navbar.html"
+	}
+
+	t, _ := template.ParseFiles(getFiles(files)...)
 
 	t.ExecuteTemplate(w, "layout.html", data)
 }
