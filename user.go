@@ -63,7 +63,15 @@ func handleShoppingCart(w http.ResponseWriter, r *http.Request) {
 		files[idx] = templateRoot + file
 	}
 	t, _ := template.ParseFiles(files...)
-	t.ExecuteTemplate(w, "layout.html", model.GetCartItems(id))
+
+	data := struct {
+		model.CartBooks
+		model.CartAddresses
+	}{
+		model.GetCartItems(id),
+		model.GetCartAddresses(id)}
+
+	t.ExecuteTemplate(w, "layout.html", data)
 }
 
 func handleUpdateCartItem(w http.ResponseWriter, r *http.Request) {
