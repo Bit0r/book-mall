@@ -46,17 +46,17 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		files[2] = "navbar.html"
 	}
 
-	t, _ := template.ParseFiles(getFiles(files)...)
+	t, _ := template.ParseFiles(getFiles(files...)...)
 
-	t.ExecuteTemplate(w, "layout.html", data)
+	t.Execute(w, data)
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("template/layout-no-nav.html", "template/log-in.html")
-	t.Execute(w, "layout-no-nav.html")
+	t, _ := template.ParseFiles(getFiles("layout-no-nav.html", "log-in.html")...)
+	t.Execute(w, nil)
 }
 
 func handleSignUp(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("template/layout-no-nav.html", "template/sign-up.html")
-	t.Execute(w, "layout-no-nav.html")
+	t, _ := template.ParseFiles(getFiles("layout-no-nav.html", "sign-up.html")...)
+	t.Execute(w, nil)
 }

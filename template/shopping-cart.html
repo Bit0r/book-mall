@@ -1,6 +1,6 @@
 {{define "content"}}
 <main class="section">
-    <form class="container" action="/order" method="post">
+    <form class="container" action="/order" target="_blank" method="post">
         <table class="table is-striped is-hoverable is-fullwidth">
             <thead>
                 <tr>
@@ -16,7 +16,7 @@
                 {{range .CartBooks}}
                 <tr id="tr-{{.ID}}">
                     <td><input type="checkbox" name="booksID" value="{{.ID}}"></td>
-                    <td>{{.Name}}——{{.Author}}</td>
+                    <td>《{{.Name}}》{{.Author}}</td>
                     <td>{{.Price}}</td>
                     <td>
                         <div class="control">

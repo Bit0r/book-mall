@@ -22,7 +22,7 @@ func main() {
 	http.ListenAndServe("localhost:8080", nil)
 }
 
-func getFiles(files []string) []string {
+func getFiles(files ...string) []string {
 	for idx, file := range files {
 		files[idx] = templateRoot + file
 	}
