@@ -45,11 +45,31 @@ func handleRegistry(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleOrder(w http.ResponseWriter, r *http.Request) {
-	if _, ok := sessions.Start(w, r).Get("userID").(uint64); ok {
-
-	} else {
+	userID, ok := sessions.Start(w, r).Get("userID").(uint64)
+	if !ok {
 		http.Redirect(w, r, "/log-in", http.StatusFound)
+		return
 	}
+
+	r.ParseForm()
+	booksID := make([]uint64, len(r.Form["booksID"]))
+	for i, v := range r.Form["booksID"] {
+		bookID, err := strconv.ParseUint(v, 0, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		booksID[i] = bookID
+	}
+	addressID, _ := strconv.Atoi(r.FormValue("addressID"))
+	err := model.AddOrder(userID, uint(addressID), booksID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	t, _ := template.ParseFiles(getFiles("layout.html", "navbar.html", "payment.html")...)
+	t.Execute(w, nil)
 }
 
 func handleShoppingCart(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +78,7 @@ func handleShoppingCart(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/log-in", http.StatusFound)
 		return
 	}
-	files := []string{"layout.html", "navbar.html", "shopping-cart.html"}
-	for idx, file := range files {
-		files[idx] = templateRoot + file
-	}
-	t, _ := template.ParseFiles(files...)
+	t, _ := template.ParseFiles(getFiles("layout.html", "navbar.html", "shopping-cart.html")...)
 
 	data := struct {
 		model.CartBooks
@@ -71,7 +87,7 @@ func handleShoppingCart(w http.ResponseWriter, r *http.Request) {
 		model.GetCartItems(id),
 		model.GetCartAddresses(id)}
 
-	t.ExecuteTemplate(w, "layout.html", data)
+	t.Execute(w, data)
 }
 
 func handleUpdateCartItem(w http.ResponseWriter, r *http.Request) {
