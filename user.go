@@ -68,7 +68,7 @@ func handleOrder(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	t, _ := template.ParseFiles(getFiles("layout.html", "navbar.html", "payment.html")...)
+	t, _ := template.ParseFiles(getFiles("layout-no-nav.html", "payment.html")...)
 	t.Execute(w, nil)
 }
 

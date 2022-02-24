@@ -65,7 +65,6 @@
     th:nth-child(4) {
         min-width: 5rem;
     }
-
 </style>
 <script>
     function toggle(checked) {
@@ -89,7 +88,7 @@
                 $tr.remove()
             } else {
                 let $cells = $tr.cells
-                $cells[4].textContent = String(Number($cells[2].textContent) * Number(quantity))
+                $cells[4].textContent = (Number($cells[2].textContent) * Number(quantity)).toFixed(2)
             }
             calcTotal()
         } else {

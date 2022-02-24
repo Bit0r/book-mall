@@ -1,0 +1,13 @@
+{{define "content"}}
+<main class="section">
+    <div class="container" id="buttons">
+        <a class="button" href="/payment?id={{.ID}}&status=transit">付款</a>
+        <a class="button" href="/payment?id={{.ID}}&status=failed">取消</a>
+    </div>
+</main>
+<style>
+    #buttons {
+        max-width: 360px !important;
+    }
+</style>
+{{end}}
